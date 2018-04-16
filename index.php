@@ -26,7 +26,7 @@
 	require('Facebook/autoload.php');
 
 	$object_id = '593412144015732';
-	$access_token = 'EAACEdEose0cBAAFvKuZCBKfptKjmuyaZANCF8fB6f7TKN3KmAULBZAAIbsWUTVJOGtUv8GkBbSL6v5rzgmvSOeOuXdWkvQfeTMvMkJKu6fJ8DTmkr2ZBQpJ0MXgf37LwCtK6HsIZBvXj4NZCpDzQe28piCkQ5koj1HUlsTKwZAj9IMQdYeOPokKcK0Yjus60meqalrc39X1PwZDZD';
+	$access_token = 'EAACEdEose0cBAFGSJYCejSN6ZAH35OqcHkIB1FMzEMgsD0Si8Snb8ilsBKuSok6ZC4JhC9GxFqaqaZBTT4MMpHZBQAukY7qZBjAk3z6jYJSj2wpjHYFsSpkNeDZARc7BpUZBSCa4ewxsvh2t0ZCtXkXwyDItHK2M4odGJabXsdyJ4VD3jpHZBxSfagwZBcZAIGQFOdWzWewfUnUZCgZDZD';
 	$metric = 'page_impressions';
 	$since = '2018-03-20';
 	$until = '2018-04-14';
@@ -35,7 +35,6 @@
 
 	$requestedInsights = file_get_contents($url);     
 	$decodedObject = json_decode($requestedInsights);
-
 
 	foreach ( $decodedObject->data as $key=>$rows ){
 
@@ -51,7 +50,6 @@
       		$date = str_replace("-", "/", substr($val2->end_time, 0, -14));
       		$date = strtotime($date);
       		$date = date('d/m',$date);
-      		//echo $date .' - '.$val2->value.'<br>';
       		$numrows++;
 
       		$values_array[] = $val2->value;
@@ -63,6 +61,8 @@
       	}
 
 	}
+
+	$total = array_sum($values_array);
 
 	$i = 0;
 	$values = '0% 100%, ';
@@ -90,10 +90,14 @@
 		padding: 20px 0;
 	}
 
+	.default-width{
+		width: 700px;
+	}
+
 	.graph{
 		display: inline-block;
   		position: relative;
-		width: 612px;
+		width: 682px;
 		height: 150px;
 		margin-bottom: -140px;
 		/*background-color: #52a5e5;*/
@@ -102,7 +106,7 @@
 
 	.graph:before {
 	  	content: '';
-	  	width: 610px;
+	  	width: 680px;
 	  	height: 150px;
 	  	<?=$values?>
 	  	display: block;
@@ -114,8 +118,8 @@
 	}
 
 	.x-axis{
-		width: 630px;
-		height: 1px;
+		width: 700px;
+		height: auto;
 		display: inline-block;
 		border-top: solid;
 		border-top-style: solid;
@@ -161,6 +165,7 @@
 	}
 
 	.x_pos_label{
+		position: absolute;
 		display: inline-block;
 		transform: rotate(-90deg);
 		font-size: 10px;
@@ -170,7 +175,7 @@
 
 
 <div class="container text-center">
-	<div class="row text-center">
+	<div class="row text-center col-lg-8 col-lg-offset-2">
 
 		<div class="y-axis">
 			<div class="y-axis-label">
@@ -200,16 +205,30 @@
 
 		<div class="x-axis text-left">
 			<?php
-				$x = 0;
+				$x = 1;
+				//$x_pos_label = '-0.33';
+				$plus = '';
+
+				echo '<span class="x_pos_label" style="margin-left:0%;">'.$row.'</span>';
+				$x_pos_label_ini = ($x*100)/($numrows);
+
 				foreach ($label_bottom_array as $row) {
-					$x_pos_label = ($x*100)/($numrows+60);
-					if($x < 1){
-						$x++;
-					}
-					echo '<span class="x_pos_label" style="margin-left:'.($x_pos_label-1.33).'%;">'.$row.'</span>';
+
+					
+					$x_pos_label = ($x_pos_label_ini*$x);
+
+					$x++;
+				
+					echo '<span class="x_pos_label" style="margin-left:'.$x_pos_label.'%;">'.$row.'</span>';
 				}
 			?>
 		</div>
 
 	</div>
+
+	<div class="infos col-lg-8 col-lg-offset-2 text-right">
+		Total: <strong><?= $total ?></strong><br />
+		Média: <strong><?= str_replace(".", ",", number_format(($total/$numrows), 2)); ?></strong><br />
+	</div>
+
 </div>
