@@ -31,6 +31,11 @@
 	$since = '2018-04-01';
 	$until = '2018-04-16';
 
+	$date1 = date_create($until);
+	$date2 = date_create($since);
+	$date_diff = date_diff($date1, $date2);
+	// echo $date_diff->days;
+
 	$url = 'https://graph.facebook.com/'.$object_id.'/insights/'.$metric.'/day/?since='.$since.'&until='.$until.'&access_token='.$access_token;
 
 	$requestedInsights = file_get_contents($url);     
@@ -101,7 +106,7 @@
 		width: 702px;
 		height: 150px;
 		margin-bottom: -140px;
-		/*background-color: #52a5e5;*/
+		background: -webkit-linear-gradient(top, #52a5e5 0%,#57f28a 100%);
   		box-sizing: border-box;
 	}
 
@@ -237,29 +242,6 @@
 
 		<div class="x-axis text-left">
 			<?php
-
-			/*
-				$x = 0;
-
-				echo '<div class="x_pos_label" style="margin-left:-1.57%;">20/03</div>';
-				$x_pos_label_ini = (1*100)/($numrows);
-
-				echo $numrows.'<br>';
-				$plus = 0;
-
-				foreach ($label_bottom_array as $row) {
-
-					
-					$x_pos_label = ($x_pos_label_ini*$x);
-
-					$plus = $plus+$x_pos_label_ini;
-					$x++;
-				
-					echo '<div class="x_pos_label" style="margin-left:'.($x_pos_label_ini-$plus).'%">'.$row.'</div>';
-				}
-
-			*/
-
 
 				$x = 1;
 
