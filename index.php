@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     
-    <script src="https://use.fontawesome.com/a0bf7d3b26.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     
     
@@ -26,10 +26,15 @@
 	require('Facebook/autoload.php');
 
 	$object_id = '593412144015732';
-	$access_token = 'EAACEdEose0cBAC8BGhgBge0RRAVFZAqulTuxSxCpkMVc9r5TkKVofAJEpCwnAZAcQc66ITdNaf3FvQDKedurYN7lxZCYWqCY95uDPCDdVFzDbMJRujXiAc4Cte6z4kreNq4NsdAXRpTfJYYPebWvHkJymETv8fTKYE7dPFpMzzzJiS9mjvkdLCia0P2mKV3bvnuZCMOUkwZDZD';
+	$access_token = 'EAACEdEose0cBAH5cxNXZAUJRlvW1cThauNoDUjbgrrD2Lt05cI1jnQ5Y7gv3vTlFpZBYibOWAZCHsbGpHqEBNCssZCHRV32566oG3ZCvPGa209Hw36LmXFaQeKm8i66hKClRPIizMOK66kWO6moEyRLDU1POPKIRirLBlnSOgnDGtEBn6U8ZCS1nYiK3IVTBvbvwGWDohFjwZDZD';
 	$metric = 'page_impressions';
-	$since = '2018-04-01';
-	$until = '2018-04-16';
+	$since = '2018-03-20';
+	$until = '2018-03-30';
+
+	$datetime1 = date_create($since);
+    $datetime2 = date_create($until);
+    $diff = date_diff($datetime1, $datetime2);
+    $diff = $diff->days;
 
 	$url = 'https://graph.facebook.com/'.$object_id.'/insights/'.$metric.'/day/?since='.$since.'&until='.$until.'&access_token='.$access_token;
 
@@ -62,6 +67,7 @@
 	}
 
 	$total = array_sum($values_array);
+	$average = number_format(($total/$numrows), 2);
 
 	$i = 0;
 	$values = '0% 100%, ';
@@ -76,6 +82,53 @@
 	$values = 'clip-path: polygon('.$values.'100% 100%);';
 
 
+    $since_past = date('Y-m-d', strtotime('-'.$diff.' day', strtotime($since)));
+	$until_past = $since;
+
+	$url_past = 'https://graph.facebook.com/'.$object_id.'/insights/'.$metric.'/day/?since='.$since_past.'&until='.$until_past.'&access_token='.$access_token;
+
+	$requestedInsights_past = file_get_contents($url_past);     
+	$decodedObject_past = json_decode($requestedInsights_past);
+
+	foreach ( $decodedObject_past->data as $key=>$rows_past ){
+
+    	$val_past 				= $rows_past->values; 
+    	$numrows_past 			= 0;
+		$values_array_past 		= array();
+
+      	foreach ( $val_past as $key2=>$rows2_past ){
+
+      		$val2_past = $rows2_past; 
+      		$numrows_past++;
+      		$values_array_past[] = $val2_past->value;
+      	}
+
+	}
+
+	$total_past = array_sum($values_array_past);
+	$average_past = number_format(($total_past/$numrows_past), 2);
+
+
+?>
+
+<?php 
+	
+	/*
+	###TREND LINE CHECKING###
+
+	echo $highest;
+	echo '<br>';
+
+	echo $average_past;
+	echo '<br>';
+	echo $total_past; 
+
+	echo '<br>'; 
+
+	echo $average;
+	echo '<br>';
+	echo $total; 
+	*/
 ?>
 
 
@@ -194,7 +247,7 @@
 	.tick > span {
 	  position:relative;
 	  left: -10px;
-	  top: 26px;
+	  top: 15px;
 	  font: 0.6em Arial, Helvetica, sans-serif;
 	  transform: rotate(-90deg);
 	}
@@ -202,6 +255,17 @@
 	.separator_dash{
 		padding: 0 30px;
 	}
+
+	.trend_line{
+		position: absolute;
+		margin-left: -700px;
+	}
+
+	<?php 
+		if($diff > 32){
+			echo '.tick:nth-child(2n+1) > span { top:5px; }';
+		}
+	?>
 
 </style>
 
@@ -226,40 +290,19 @@
 				<span class="end">0</span>
 			</div>
 
-			<?php
-				
-			?>
-
 		</div>
 
 		<div class="graph" style="<?=$values?>">
 		</div>
 
+		<svg class="trend_line" height="150" width="700">
+			<?php  $ytrend = (150-(($average_past*150)/$highest)); if($ytrend < 0 ){ $ytrend = '0'; } ?>
+		  	<line x1="0" y1="<?= $ytrend ?>" x2="700" y2="<?= 150-(($average*150)/$highest) ?>" style="stroke:rgb(128,128,128);stroke-width:0.5" />
+		</svg>
+
+
 		<div class="x-axis text-left">
 			<?php
-
-			/*
-				$x = 0;
-
-				echo '<div class="x_pos_label" style="margin-left:-1.57%;">20/03</div>';
-				$x_pos_label_ini = (1*100)/($numrows);
-
-				echo $numrows.'<br>';
-				$plus = 0;
-
-				foreach ($label_bottom_array as $row) {
-
-					
-					$x_pos_label = ($x_pos_label_ini*$x);
-
-					$plus = $plus+$x_pos_label_ini;
-					$x++;
-				
-					echo '<div class="x_pos_label" style="margin-left:'.($x_pos_label_ini-$plus).'%">'.$row.'</div>';
-				}
-
-			*/
-
 
 				$x = 1;
 
@@ -286,12 +329,30 @@
 			<?= $tick ?>
 		</div>
 
+		<div class="infos default-width text-right">
+			Total: <strong><?= $total ?></strong>
+			<span class="separator_dash"> | </span>    
+			Média: <strong><?= str_replace(".", ",", number_format(($total/$numrows), 2)); ?></strong>
+			<span class="separator_dash"> | </span> 
+			%Variação <small>(mesmo período)</small>: 
+				<?php 
+					$variation = str_replace(".", ",", number_format((($total*100)/$total_past)-100, 2)); 
+
+					if($variation < 0){
+						$variation_style = 'style="color:#f00;"';
+						$variation_icon = '<i class="fas fa-caret-down"></i>';
+					}
+					else {
+						$variation_style = 'style="color:#00d02d;"';
+						$variation_icon = '<i class="fas fa-caret-up"></i>';
+					}
+
+				?>	
+				<strong <?= $variation_style ?> ><?= $variation.' '.$variation_icon ?></strong>
+		</div>
+
 	</div>
 
-	<div class="infos default-width text-right">
-		Total: <strong><?= $total ?></strong>
-		<span class="separator_dash"> | </span>    
-		Média: <strong><?= str_replace(".", ",", number_format(($total/$numrows), 2)); ?></strong><br />
-	</div>
+	
 
 </div>
