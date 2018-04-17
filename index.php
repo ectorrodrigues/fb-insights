@@ -26,10 +26,10 @@
 	require('Facebook/autoload.php');
 
 	$object_id = '593412144015732';
-	$access_token = 'EAACEdEose0cBAFGSJYCejSN6ZAH35OqcHkIB1FMzEMgsD0Si8Snb8ilsBKuSok6ZC4JhC9GxFqaqaZBTT4MMpHZBQAukY7qZBjAk3z6jYJSj2wpjHYFsSpkNeDZARc7BpUZBSCa4ewxsvh2t0ZCtXkXwyDItHK2M4odGJabXsdyJ4VD3jpHZBxSfagwZBcZAIGQFOdWzWewfUnUZCgZDZD';
+	$access_token = 'EAACEdEose0cBAC8BGhgBge0RRAVFZAqulTuxSxCpkMVc9r5TkKVofAJEpCwnAZAcQc66ITdNaf3FvQDKedurYN7lxZCYWqCY95uDPCDdVFzDbMJRujXiAc4Cte6z4kreNq4NsdAXRpTfJYYPebWvHkJymETv8fTKYE7dPFpMzzzJiS9mjvkdLCia0P2mKV3bvnuZCMOUkwZDZD';
 	$metric = 'page_impressions';
-	$since = '2018-03-20';
-	$until = '2018-04-14';
+	$since = '2018-04-01';
+	$until = '2018-04-16';
 
 	$url = 'https://graph.facebook.com/'.$object_id.'/insights/'.$metric.'/day/?since='.$since.'&until='.$until.'&access_token='.$access_token;
 
@@ -48,8 +48,7 @@
 
       		$val2 = $rows2; 
       		$date = str_replace("-", "/", substr($val2->end_time, 0, -14));
-      		$date = strtotime($date);
-      		$date = date('d/m',$date);
+      		$date = date('d/m', strtotime('-1 day', strtotime($date)));
       		$numrows++;
 
       		$values_array[] = $val2->value;
@@ -84,6 +83,7 @@
 	body{
 		font-family: 'Montserrat', sans-serif;
 		font-weight: 400;
+		color: #666;
 	}
 
 	.row{
@@ -92,12 +92,13 @@
 
 	.default-width{
 		width: 700px;
+		display: inline-table;
 	}
 
 	.graph{
 		display: inline-block;
   		position: relative;
-		width: 682px;
+		width: 702px;
 		height: 150px;
 		margin-bottom: -140px;
 		/*background-color: #52a5e5;*/
@@ -106,7 +107,7 @@
 
 	.graph:before {
 	  	content: '';
-	  	width: 680px;
+	  	width: 700px;
 	  	height: 150px;
 	  	<?=$values?>
 	  	display: block;
@@ -120,17 +121,13 @@
 	.x-axis{
 		width: 700px;
 		height: auto;
-		display: inline-block;
-		border-top: solid;
-		border-top-style: solid;
-		border-top-width: 1px;
-		border-top-color: #ccc;
+		text-align: justify;
 	}
 
 	.y-axis{
 		width: 15px;
 		height: 150px;
-		margin-left: -35px;
+		margin-left: -40px;
 		padding-right: 5px;
 		display: inline-table;
 		text-align: -webkit-right;
@@ -165,17 +162,52 @@
 	}
 
 	.x_pos_label{
-		position: absolute;
+		position: relative;
 		display: inline-block;
 		transform: rotate(-90deg);
 		font-size: 10px;
 		margin-top: 15px;
 	}
+
+	.chart {
+	    width:700px;
+	    height: 1px;
+	    margin: 5px 10px 50px 0px;
+	    position: relative;
+	  }
+	.chart:after {
+	    content:' ';
+	    display:block;
+	    border:0.5px solid #999;
+	    position:relative;
+	    top:1px;
+	    left: -2px;
+	}
+
+	.tick {
+	  	border-left: 1px solid #999;
+	  	height: 5px;
+	  	top: 1px;
+	  	position: absolute;
+	}
+
+	.tick > span {
+	  position:relative;
+	  left: -10px;
+	  top: 26px;
+	  font: 0.6em Arial, Helvetica, sans-serif;
+	  transform: rotate(-90deg);
+	}
+
+	.separator_dash{
+		padding: 0 30px;
+	}
+
 </style>
 
 
 <div class="container text-center">
-	<div class="row text-center col-lg-8 col-lg-offset-2">
+	<div class="row text-center default-width">
 
 		<div class="y-axis">
 			<div class="y-axis-label">
@@ -205,29 +237,60 @@
 
 		<div class="x-axis text-left">
 			<?php
-				$x = 1;
-				//$x_pos_label = '-0.33';
-				$plus = '';
 
-				echo '<span class="x_pos_label" style="margin-left:0%;">'.$row.'</span>';
-				$x_pos_label_ini = ($x*100)/($numrows);
+			/*
+				$x = 0;
+
+				echo '<div class="x_pos_label" style="margin-left:-1.57%;">20/03</div>';
+				$x_pos_label_ini = (1*100)/($numrows);
+
+				echo $numrows.'<br>';
+				$plus = 0;
 
 				foreach ($label_bottom_array as $row) {
 
 					
 					$x_pos_label = ($x_pos_label_ini*$x);
 
+					$plus = $plus+$x_pos_label_ini;
 					$x++;
 				
-					echo '<span class="x_pos_label" style="margin-left:'.$x_pos_label.'%;">'.$row.'</span>';
+					echo '<div class="x_pos_label" style="margin-left:'.($x_pos_label_ini-$plus).'%">'.$row.'</div>';
 				}
+
+			*/
+
+
+				$x = 1;
+
+				$chart_x_style = '<style>';
+				$divisions = (700/($numrows-1));
+				$divisions_result = '-2';
+				$tick = '';
+
+				foreach ($label_bottom_array as $row) {
+					
+					$chart_x_style .= ' .tick:nth-child('.$x.'){ left: '.($divisions_result-1.66).'px ; }';
+					$divisions_result = $divisions*$x;
+					$tick .= '<div class="tick"><span>'.$row.'</span></div>';
+					$x++;
+				}
+
+				$chart_x_style .= '</style>';
 			?>
+		</div>
+
+		<?= $chart_x_style ?>
+
+		<div class="chart">
+			<?= $tick ?>
 		</div>
 
 	</div>
 
-	<div class="infos col-lg-8 col-lg-offset-2 text-right">
-		Total: <strong><?= $total ?></strong><br />
+	<div class="infos default-width text-right">
+		Total: <strong><?= $total ?></strong>
+		<span class="separator_dash"> | </span>    
 		Média: <strong><?= str_replace(".", ",", number_format(($total/$numrows), 2)); ?></strong><br />
 	</div>
 
