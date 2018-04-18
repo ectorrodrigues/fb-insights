@@ -185,9 +185,35 @@
 	   }(document, 'script', 'facebook-jssdk'));
 	</script>
 
+
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '124674048314985',
+      xfbml      : true,
+      version    : 'v2.10'
+    });
+
+    FB.AppEvents.logPageView();
+
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
 <?php
 
-require('Facebook/autoload.php');
+include('Facebook/autoload.php');
+
 
 $page		= $_POST['page'];
 $since 		= $_POST['since'];
@@ -247,8 +273,12 @@ function create_chart($chart_number, $title, $metric){
 	global $until;
 	global $pageid;
 
+	//APP Authentication
+	//$object_id = '549965328730238';
+	//$access_token = 'EAABxYZCBczmkBAF8iYYPLDIcWKTZBVLrhNl1xAjSjJObtg08HsZBZCekCyVunMLaBPSilj28uMwPAeQRGpWfd3eFSg7qMZCadqwPDMivtCZBL4MYIiYjoQOAvFDkNucJmfEXG5rRRdTecodrVqfUEsrkrdCZAZBp1vVor3jDse118gZDZD';
+
 	$object_id = $pageid;
-	$access_token = 'EAABxYZCBczmkBABhfhcukA2KZC8xbxqwUkH69pUenulFdVFZAlssNXv4VDCrk9ZBspbrbfxurddknVsMisnoZAUZC9fxcWDNiM4wQ8RjFVi4T7UJwRoZCLCMQkOAc6ZCjLas68gmO5uat0oxflqFGcGHBHeZCwNoV8qSZCT6n6NlQooJBpath7GwPE';
+	$access_token = 'EAACEdEose0cBAMYcUT7kctg6tWT8ORNWVNtnIBiTtaLeJDAOit8lNAdrajFi2QYau9lOetHJ8dfYZAhT4hzPKHDbzo8jvvdF8Mf0q3iqYTZC6MUOl791MCzILqyCWpJP4V1nV1RtZAPlUZAQOBvg4ZChmMlhoDJBTAMLt2dfCNxZCXq1oclVVil9Bqr9bnZBIXWZAS0BTJ6zXQZDZD';
 	$metric = $metric;
 	$since = $since;
 	$until = $until;
@@ -278,15 +308,35 @@ function create_chart($chart_number, $title, $metric){
       		$date = date('d/m', strtotime('-1 day', strtotime($date)));
       		$numrows++;
 
-      		$values_array[] = $val2->value;
+      		if($metric == 'page_actions_post_reactions_total'){
+      			$added_value = ($val2->value->like)+($val2->value->love)+($val2->value->like)+($val2->value->wow)+($val2->value->haha)+($val2->value->sorry)+($val2->value->anger);
+      			$values_array[] = $added_value;
+			}
+			else {
+				$values_array[] = $val2->value;
+			}
+
+      		
       		$label_bottom_array[] = $date;
 
-      		if($val2->value > $highest){
-      			$highest = $val2->value;
-      		}
+
+      		if($metric == 'page_actions_post_reactions_total'){
+	      		if($added_value > $highest){
+	      			$highest = $added_value;
+	      		}
+	      	}
+	      	else{
+	      		if($val2->value > $highest){
+	      			$highest = $val2->value;
+	      		}
+	      	}
       	}
 
 	}
+
+	//print_r($values_array);
+
+	
 
 	$total = array_sum($values_array);
 	$average = number_format(($total/$numrows), 2);
@@ -476,6 +526,7 @@ echo '<div class="container text-center">';
 create_chart('1', 'Impressões', 'page_impressions');
 create_chart('2', 'Alcance', 'page_impressions_unique');
 create_chart('3', 'Consumos', 'page_consumptions');
+create_chart('4', 'Curtidas & Reações', 'page_actions_post_reactions_total');
 
 echo '</div>';
 
