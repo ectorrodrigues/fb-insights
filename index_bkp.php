@@ -15,37 +15,26 @@
     
     <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-    <style type="text/css">
-    	body{
-    		background-color: #eee;
-    	}
-    	.p-3{
-    		padding: 10% 0;
-    	}
-    </style>
     
     
     <title>FB Insights</title>
 </head>
 
-<body>
 
-<<<<<<< HEAD
 <?php
 
 	require('Facebook/autoload.php');
 
 	$object_id = '593412144015732';
-	$access_token = 'EAACEdEose0cBAC8BGhgBge0RRAVFZAqulTuxSxCpkMVc9r5TkKVofAJEpCwnAZAcQc66ITdNaf3FvQDKedurYN7lxZCYWqCY95uDPCDdVFzDbMJRujXiAc4Cte6z4kreNq4NsdAXRpTfJYYPebWvHkJymETv8fTKYE7dPFpMzzzJiS9mjvkdLCia0P2mKV3bvnuZCMOUkwZDZD';
+	$access_token = 'EAACEdEose0cBAGKH4LvvEt7vBXXq4yg4iYZAEJiFMl5kWUsZAjoZAi4zQBd7zkrrgTPcDZB9xRIsZBZCBMpUZAZB53gUWtbVYtjk28yS5mPpIioZCBIn1zgSrOyAcZAZAp3f6UvVhkNmKmFpoCwtXuMt5uZCharTc0NtwQLS15hfDa55T8gGyj19u84K8FxIPA2mJ07Ch3eU7pwX6QZDZD';
 	$metric = 'page_impressions';
-	$since = '2018-04-01';
-	$until = '2018-04-16';
+	$since = '2018-03-20';
+	$until = '2018-03-30';
 
-	$date1 = date_create($until);
-	$date2 = date_create($since);
-	$date_diff = date_diff($date1, $date2);
-	// echo $date_diff->days;
+	$datetime1 = date_create($since);
+    $datetime2 = date_create($until);
+    $diff = date_diff($datetime1, $datetime2);
+    $diff = $diff->days;
 
 	$url = 'https://graph.facebook.com/'.$object_id.'/insights/'.$metric.'/day/?since='.$since.'&until='.$until.'&access_token='.$access_token;
 
@@ -78,6 +67,7 @@
 	}
 
 	$total = array_sum($values_array);
+	$average = number_format(($total/$numrows), 2);
 
 	$i = 0;
 	$values = '0% 100%, ';
@@ -92,6 +82,53 @@
 	$values = 'clip-path: polygon('.$values.'100% 100%);';
 
 
+    $since_past = date('Y-m-d', strtotime('-'.$diff.' day', strtotime($since)));
+	$until_past = $since;
+
+	$url_past = 'https://graph.facebook.com/'.$object_id.'/insights/'.$metric.'/day/?since='.$since_past.'&until='.$until_past.'&access_token='.$access_token;
+
+	$requestedInsights_past = file_get_contents($url_past);     
+	$decodedObject_past = json_decode($requestedInsights_past);
+
+	foreach ( $decodedObject_past->data as $key=>$rows_past ){
+
+    	$val_past 				= $rows_past->values; 
+    	$numrows_past 			= 0;
+		$values_array_past 		= array();
+
+      	foreach ( $val_past as $key2=>$rows2_past ){
+
+      		$val2_past = $rows2_past; 
+      		$numrows_past++;
+      		$values_array_past[] = $val2_past->value;
+      	}
+
+	}
+
+	$total_past = array_sum($values_array_past);
+	$average_past = number_format(($total_past/$numrows_past), 2);
+
+
+?>
+
+<?php 
+	
+	/*
+	###TREND LINE CHECKING###
+
+	echo $highest;
+	echo '<br>';
+
+	echo $average_past;
+	echo '<br>';
+	echo $total_past; 
+
+	echo '<br>'; 
+
+	echo $average;
+	echo '<br>';
+	echo $total; 
+	*/
 ?>
 
 
@@ -117,7 +154,7 @@
 		width: 702px;
 		height: 150px;
 		margin-bottom: -140px;
-		background: -webkit-linear-gradient(top, #52a5e5 0%,#57f28a 100%);
+		/*background-color: #52a5e5;*/
   		box-sizing: border-box;
 	}
 
@@ -139,34 +176,52 @@
 		height: auto;
 		text-align: justify;
 	}
-=======
-<div class="container p-3">
->>>>>>> 7fcfc6c0879651078964317b056cbd3f486c4515
 
-	<div class="row col-lg-8 col-lg-offset-2">
+	.y-axis{
+		width: 15px;
+		height: 150px;
+		margin-left: -40px;
+		padding-right: 5px;
+		display: inline-table;
+		text-align: -webkit-right;
+		border-right: solid;
+		border-right-style: solid;
+		border-right-width: 1px;
+		border-right-color: #ccc;
+	}
 
-		<form action="chart.php" method="post" enctype="multipart/form-data">
+	.y-axis-label{
+		height: 20%;
+		display: table;
+		text-align: right;
+		font-size: 10px;
+	}
 
-					<div class="form-group col-lg-12">
-						<label>Company</label>
-					    <input type="text" name="company" class="form-control" >
-					</div>
+	.y-axis-label .start{
+		align-self: flex-start;
+		text-align: right;
+	}
 
-					<div class="form-group col-lg-12">
-						<label>Since Date</label>
-					    <input type="date" name="since" class="form-control" >
-					</div>
+	.y-axis-label .center{
+		text-align: right;
+		display: table-cell;
+		vertical-align: middle;
+	}
 
-					<div class="form-group col-lg-12">
-						<label>Until Date</label>
-					    <input type="date" name="until" class="form-control" >
-					</div>
+	.y-axis-label .end{
+		display: table-cell;
+		vertical-align: bottom;
+		text-align: right;
+	}
 
-					<div class="form-group col-md-12 padding-top-bottom text-right">
-						<button type="submit" class="btn btn-primary transition">Generate</button>
-					</div>
+	.x_pos_label{
+		position: relative;
+		display: inline-block;
+		transform: rotate(-90deg);
+		font-size: 10px;
+		margin-top: 15px;
+	}
 
-<<<<<<< HEAD
 	.chart {
 	    width:700px;
 	    height: 1px;
@@ -192,7 +247,7 @@
 	.tick > span {
 	  position:relative;
 	  left: -10px;
-	  top: 26px;
+	  top: 15px;
 	  font: 0.6em Arial, Helvetica, sans-serif;
 	  transform: rotate(-90deg);
 	}
@@ -200,6 +255,17 @@
 	.separator_dash{
 		padding: 0 30px;
 	}
+
+	.trend_line{
+		position: absolute;
+		margin-left: -700px;
+	}
+
+	<?php 
+		if($diff > 32){
+			echo '.tick:nth-child(2n+1) > span { top:5px; }';
+		}
+	?>
 
 </style>
 
@@ -224,14 +290,16 @@
 				<span class="end">0</span>
 			</div>
 
-			<?php
-				
-			?>
-
 		</div>
 
 		<div class="graph" style="<?=$values?>">
 		</div>
+
+		<svg class="trend_line" height="150" width="700">
+			<?php  $ytrend = (150-(($average_past*150)/$highest)); if($ytrend < 0 ){ $ytrend = '0'; } ?>
+		  	<line x1="0" y1="<?= $ytrend ?>" x2="700" y2="<?= 150-(($average*150)/$highest) ?>" style="stroke:rgb(128,128,128);stroke-width:0.5" />
+		</svg>
+
 
 		<div class="x-axis text-left">
 			<?php
@@ -260,14 +328,31 @@
 		<div class="chart">
 			<?= $tick ?>
 		</div>
-=======
-			</form>
->>>>>>> 7fcfc6c0879651078964317b056cbd3f486c4515
+
+		<div class="infos default-width text-right">
+			Total: <strong><?= $total ?></strong>
+			<span class="separator_dash"> | </span>    
+			Média: <strong><?= str_replace(".", ",", number_format(($total/$numrows), 2)); ?></strong>
+			<span class="separator_dash"> | </span> 
+			%Variação <small>(mesmo período)</small>: 
+				<?php 
+					$variation = str_replace(".", ",", number_format((($total*100)/$total_past)-100, 2)); 
+
+					if($variation < 0){
+						$variation_style = 'style="color:#f00;"';
+						$variation_icon = '<i class="fas fa-caret-down"></i>';
+					}
+					else {
+						$variation_style = 'style="color:#00d02d;"';
+						$variation_icon = '<i class="fas fa-caret-up"></i>';
+					}
+
+				?>	
+				<strong <?= $variation_style ?> ><?= $variation.' '.$variation_icon ?></strong>
+		</div>
 
 	</div>
 
-</div>	
 	
-</body>
 
-</html>
+</div>
