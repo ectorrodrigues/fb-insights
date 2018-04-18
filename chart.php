@@ -16,7 +16,6 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-
     <style type="text/css">
     	body{
 			font-family: "Montserrat", sans-serif;
@@ -30,15 +29,40 @@
 		    border-bottom-width: 2px;
 		}
 
+		.w-100{
+			width: 100%;
+		}
+
 		.default-width{
 			width: 700px;
 			display: inline-table;
+		}
+
+		small{
+			font-size: 75%;
+			font-style: italic;
+			color:#bbb;
 		}
 
 		h2{
 			font-size: 20px;
 			font-weight: 700;
 			margin-bottom: 40px;
+		}
+
+		.media-body{
+			vertical-align: middle;
+			padding-left: 15px;
+		}
+
+		.title{
+			font-size: 23px;
+			font-weight: 700;
+			margin: 0 !important;
+		}
+
+		.mt{
+			margin-top:30px;
 		}
 
 		.x-axis{
@@ -137,23 +161,94 @@
 </head>
 
 
+<body>
+
+	<script>
+	  window.fbAsyncInit = function() {
+	    FB.init({
+	      appId      : '124674048314985',
+	      cookie     : true,
+	      xfbml      : true,
+	      version    : 'v2.12'
+	    });
+	      
+	    FB.AppEvents.logPageView();   
+	      
+	  };
+
+	  (function(d, s, id){
+	     var js, fjs = d.getElementsByTagName(s)[0];
+	     if (d.getElementById(id)) {return;}
+	     js = d.createElement(s); js.id = id;
+	     js.src = "https://connect.facebook.net/en_US/sdk.js";
+	     fjs.parentNode.insertBefore(js, fjs);
+	   }(document, 'script', 'facebook-jssdk'));
+	</script>
+
 <?php
 
 require('Facebook/autoload.php');
 
-$company	= $_POST['company'];
+$page		= $_POST['page'];
 $since 		= $_POST['since'];
 $until 		= $_POST['until'];
 
+function db () {
+	static $conn;
+
+	$servername	= 'localhost';
+	$dbname		= 'fb_insights';
+	$username	= 'root';
+	$password	= '';
+							
+	$conn = new PDO("mysql:host=".$servername.";dbname=".$dbname, $username, $password, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'"));
+	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+	return $conn;
+}
+
+$conn = db();
+
+foreach($conn->query("SELECT * FROM pages WHERE id = '".$page."' ") as $row) {
+	$pageid 	= $row['page_id'];
+	$pagetitle 	= $row['title'];
+	$pageimg 	= $row['img'];
+}
+
+?>
+<div class="w-100 text-center mt">
+
+	<div class="media text-left default-width">
+  		<img class="align-self-center mr-3" src="img/<?= $pageimg ?>" alt="Logo" width="90">
+  		<div class="media-body">
+    		<div class="col-lg-12 text-left">
+	    		Relatório de Mídias Sociais<br>
+	    		<div class="title"><?= $pagetitle ?></div>
+	    		<small class="mt-0 pt-0">
+	    			<?= date('d/m/Y', strtotime($since)) ?> à <?= date('d/m/Y', strtotime($until)) ?>
+	    		</small>
+	    	</div>
+
+	    	<div class="col-lg-6 text-right">
+	    		
+	    	</div>
+
+    	</div>
+	</div>
+
+</div>
+
+<?php
 
 function create_chart($chart_number, $title, $metric){
 
 	global $company;
 	global $since;
 	global $until;
+	global $pageid;
 
-	$object_id = '593412144015732';
-	$access_token = 'EAACEdEose0cBAPeX6HlJE2tpN2zQbHQvEZBDuGIukReKX4UAdZBU4l358GxyTRgnkq6ZBKdvrZAKVGMEYaSKmLaQAboSIlZALNpWEdP5ENP2F2TVTSgtzFv5cM6ydtZC4jd7wvCI0qBZCHdK6VLJzbsu3vS21f2NAMqrOL5uxK9B4Hh53JR1Q1URGpSQzxyjcLHoQIKRQjfdwZDZD';
+	$object_id = $pageid;
+	$access_token = 'EAABxYZCBczmkBABhfhcukA2KZC8xbxqwUkH69pUenulFdVFZAlssNXv4VDCrk9ZBspbrbfxurddknVsMisnoZAUZC9fxcWDNiM4wQ8RjFVi4T7UJwRoZCLCMQkOAc6ZCjLas68gmO5uat0oxflqFGcGHBHeZCwNoV8qSZCT6n6NlQooJBpath7GwPE';
 	$metric = $metric;
 	$since = $since;
 	$until = $until;
@@ -273,7 +368,6 @@ echo '
 
 
 echo '
-<div class="container text-center">
 	<div class="row text-center default-width">
 
 		<h2 class="text-left"><i class="fas fa-angle-double-right"></i> '.$title.'</h2>
@@ -373,22 +467,23 @@ echo '
 		</div>
 
 	</div>
-
-</div>';
+		';
 
 }
 
+echo '<div class="container text-center">';
 
 create_chart('1', 'Impressões', 'page_impressions');
-
 create_chart('2', 'Alcance', 'page_impressions_unique');
-
 create_chart('3', 'Consumos', 'page_consumptions');
+
+echo '</div>';
 
 //create_chart('4', 'Reações', 'page_actions_post_reactions_total');
 
 
-
-
-
 ?>
+
+</body>
+
+</html>

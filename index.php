@@ -23,6 +23,14 @@
     	.p-3{
     		padding: 10% 0;
     	}
+
+    	.separator{
+    		width: 100%;
+    		height: 1px;
+    		margin:20px 0;
+    		border-bottom: solid;
+    		border-bottom-width: 2px;
+    	}
     </style>
     
     
@@ -31,238 +39,90 @@
 
 <body>
 
-<<<<<<< HEAD
-<?php
-
-	require('Facebook/autoload.php');
-
-	$object_id = '593412144015732';
-	$access_token = 'EAACEdEose0cBAC8BGhgBge0RRAVFZAqulTuxSxCpkMVc9r5TkKVofAJEpCwnAZAcQc66ITdNaf3FvQDKedurYN7lxZCYWqCY95uDPCDdVFzDbMJRujXiAc4Cte6z4kreNq4NsdAXRpTfJYYPebWvHkJymETv8fTKYE7dPFpMzzzJiS9mjvkdLCia0P2mKV3bvnuZCMOUkwZDZD';
-	$metric = 'page_impressions';
-	$since = '2018-04-01';
-	$until = '2018-04-16';
-
-	$date1 = date_create($until);
-	$date2 = date_create($since);
-	$date_diff = date_diff($date1, $date2);
-	// echo $date_diff->days;
-
-	$url = 'https://graph.facebook.com/'.$object_id.'/insights/'.$metric.'/day/?since='.$since.'&until='.$until.'&access_token='.$access_token;
-
-	$requestedInsights = file_get_contents($url);     
-	$decodedObject = json_decode($requestedInsights);
-
-	foreach ( $decodedObject->data as $key=>$rows ){
-
-    	$val 				= $rows->values; 
-    	$numrows 			= 0;
-    	$highest 			= 0;
-		$values_array 		= array();
-		$label_bottom_array	= array();
-
-      	foreach ( $val as $key2=>$rows2 ){
-
-      		$val2 = $rows2; 
-      		$date = str_replace("-", "/", substr($val2->end_time, 0, -14));
-      		$date = date('d/m', strtotime('-1 day', strtotime($date)));
-      		$numrows++;
-
-      		$values_array[] = $val2->value;
-      		$label_bottom_array[] = $date;
-
-      		if($val2->value > $highest){
-      			$highest = $val2->value;
-      		}
-      	}
-
-	}
-
-	$total = array_sum($values_array);
-
-	$i = 0;
-	$values = '0% 100%, ';
-	foreach ($values_array as $row) {
-		$x_pos = ($i*100)/($numrows-1);
-		$y_pos = ($row*100)/$highest;
-		$i++;
-
-		$values .= $x_pos.'% '.(100-$y_pos).'%, ';
-	}
-
-	$values = 'clip-path: polygon('.$values.'100% 100%);';
-
-
-?>
-
-
-<style type="text/css">
-	body{
-		font-family: 'Montserrat', sans-serif;
-		font-weight: 400;
-		color: #666;
-	}
-
-	.row{
-		padding: 20px 0;
-	}
-
-	.default-width{
-		width: 700px;
-		display: inline-table;
-	}
-
-	.graph{
-		display: inline-block;
-  		position: relative;
-		width: 702px;
-		height: 150px;
-		margin-bottom: -140px;
-		background: -webkit-linear-gradient(top, #52a5e5 0%,#57f28a 100%);
-  		box-sizing: border-box;
-	}
-
-	.graph:before {
-	  	content: '';
-	  	width: 700px;
-	  	height: 150px;
-	  	<?=$values?>
-	  	display: block;
-	  	position: absolute;
-	  	top: 2px;
-	  	left: 1px;
-
-	  	background: -webkit-linear-gradient(top, #52a5e5 0%,#57f28a 100%);
-	}
-
-	.x-axis{
-		width: 700px;
-		height: auto;
-		text-align: justify;
-	}
-=======
 <div class="container p-3">
->>>>>>> 7fcfc6c0879651078964317b056cbd3f486c4515
 
 	<div class="row col-lg-8 col-lg-offset-2">
 
 		<form action="chart.php" method="post" enctype="multipart/form-data">
 
-					<div class="form-group col-lg-12">
-						<label>Company</label>
-					    <input type="text" name="company" class="form-control" >
-					</div>
+			<div class="form-group col-lg-12">
+				<label>Page</label>
 
-					<div class="form-group col-lg-12">
-						<label>Since Date</label>
-					    <input type="date" name="since" class="form-control" >
-					</div>
+				<select name="page" class="form-control" >
+				<?php
+					function db () {
+						static $conn;
 
-					<div class="form-group col-lg-12">
-						<label>Until Date</label>
-					    <input type="date" name="until" class="form-control" >
-					</div>
+						$servername	= 'localhost';
+						$dbname		= 'fb_insights';
+						$username	= 'root';
+						$password	= '';
+							
+						$conn = new PDO("mysql:host=".$servername.";dbname=".$dbname, $username, $password, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'"));
+						$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-					<div class="form-group col-md-12 padding-top-bottom text-right">
-						<button type="submit" class="btn btn-primary transition">Generate</button>
-					</div>
+						return $conn;
+					}
 
-<<<<<<< HEAD
-	.chart {
-	    width:700px;
-	    height: 1px;
-	    margin: 5px 10px 50px 0px;
-	    position: relative;
-	  }
-	.chart:after {
-	    content:' ';
-	    display:block;
-	    border:0.5px solid #999;
-	    position:relative;
-	    top:1px;
-	    left: -2px;
-	}
+					$conn = db();
 
-	.tick {
-	  	border-left: 1px solid #999;
-	  	height: 5px;
-	  	top: 1px;
-	  	position: absolute;
-	}
+					foreach($conn->query("SELECT * FROM pages ORDER BY title ASC") as $row) {
+						$id = $row['id'];
+						$title = $row['title'];
 
-	.tick > span {
-	  position:relative;
-	  left: -10px;
-	  top: 26px;
-	  font: 0.6em Arial, Helvetica, sans-serif;
-	  transform: rotate(-90deg);
-	}
+						echo '<option value="'.$id.'">'.$title.'</option>';
+					}
 
-	.separator_dash{
-		padding: 0 30px;
-	}
+				?>
+				</select>
 
-</style>
-
-
-<div class="container text-center">
-	<div class="row text-center default-width">
-
-		<div class="y-axis">
-			<div class="y-axis-label">
-				<span class="start"><?=$highest?></span>
-			</div>
-			<div class="y-axis-label">
-				<span class="center"><?=($highest-($highest*0.25))?></span>
-			</div>
-			<div class="y-axis-label">
-				<span class="center"><?=($highest/2)?></span>
-			</div>
-			<div class="y-axis-label">
-				<span class="center"><?=($highest-($highest*0.75))?></span>
-			</div>
-			<div class="y-axis-label">
-				<span class="end">0</span>
+			   	
 			</div>
 
-			<?php
-				
-			?>
+			<div class="form-group col-lg-12">
+				<label>Since Date</label>
+				<input type="date" name="since" class="form-control" >
+			</div>
 
-		</div>
+			<div class="form-group col-lg-12">
+				<label>Until Date</label>
+				<input type="date" name="until" class="form-control" >
+			</div>
 
-		<div class="graph" style="<?=$values?>">
-		</div>
+			<div class="form-group col-md-12 padding-top-bottom text-right">
+				<button type="submit" class="btn btn-primary transition">Generate</button>
+			</div>
 
-		<div class="x-axis text-left">
-			<?php
+		</form>
 
-				$x = 1;
+	</div>
 
-				$chart_x_style = '<style>';
-				$divisions = (700/($numrows-1));
-				$divisions_result = '-2';
-				$tick = '';
+	<div class="row col-lg-8 col-lg-offset-2 separator"></div>
 
-				foreach ($label_bottom_array as $row) {
-					
-					$chart_x_style .= ' .tick:nth-child('.$x.'){ left: '.($divisions_result-1.66).'px ; }';
-					$divisions_result = $divisions*$x;
-					$tick .= '<div class="tick"><span>'.$row.'</span></div>';
-					$x++;
-				}
+	<div class="row col-lg-8 col-lg-offset-2">
 
-				$chart_x_style .= '</style>';
-			?>
-		</div>
+		<form action="add.php" method="post" enctype="multipart/form-data">
 
-		<?= $chart_x_style ?>
+			<div class="form-group col-lg-12">
+				<label>Page Name</label>
+			   	<input type="text" name="name" class="form-control" >
+			</div>
 
-		<div class="chart">
-			<?= $tick ?>
-		</div>
-=======
-			</form>
->>>>>>> 7fcfc6c0879651078964317b056cbd3f486c4515
+			<div class="form-group col-lg-12">
+				<label>Page ID</label>
+				<input type="text" name="pageid" class="form-control" >
+			</div>
+
+			<div class="form-group col-lg-12">
+				<label>Logo</label>
+				<input type="file" name="img" class="form-control" >
+			</div>
+
+			<div class="form-group col-md-12 padding-top-bottom text-right">
+				<button type="submit" class="btn btn-primary transition">Add Page</button>
+			</div>
+
+		</form>
 
 	</div>
 
