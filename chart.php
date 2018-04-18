@@ -278,10 +278,22 @@ function create_chart($chart_number, $title, $metric){
 	//$access_token = 'EAABxYZCBczmkBAF8iYYPLDIcWKTZBVLrhNl1xAjSjJObtg08HsZBZCekCyVunMLaBPSilj28uMwPAeQRGpWfd3eFSg7qMZCadqwPDMivtCZBL4MYIiYjoQOAvFDkNucJmfEXG5rRRdTecodrVqfUEsrkrdCZAZBp1vVor3jDse118gZDZD';
 
 	$object_id = $pageid;
-	$access_token = 'EAACEdEose0cBAMYcUT7kctg6tWT8ORNWVNtnIBiTtaLeJDAOit8lNAdrajFi2QYau9lOetHJ8dfYZAhT4hzPKHDbzo8jvvdF8Mf0q3iqYTZC6MUOl791MCzILqyCWpJP4V1nV1RtZAPlUZAQOBvg4ZChmMlhoDJBTAMLt2dfCNxZCXq1oclVVil9Bqr9bnZBIXWZAS0BTJ6zXQZDZD';
+	$access_token = 'EAACEdEose0cBAMLhRX4goJNR70mJhuRTElrKx9PAYXt2OSCZBATgijCCSKylSv5I7t3PaoPLPozczp0XZAyW6LOXoMpZBoAPrqIjHZBrS6PQbTlZC2det5QD7HIvElrBpWUplmzscap3netyi7xQNIQbTCOS4IW95buq1qCChzkhvF885Fmf7BuDHyiRJsTgVTIRDXlGHhQZDZD';
 	$metric = $metric;
 	$since = $since;
 	$until = $until;
+
+
+
+
+
+
+
+
+
+
+
+
 
 	$datetime1 = date_create($since);
     $datetime2 = date_create($until);
@@ -526,9 +538,11 @@ echo '<div class="container text-center">';
 create_chart('1', 'Impressões', 'page_impressions');
 create_chart('2', 'Alcance', 'page_impressions_unique');
 create_chart('3', 'Consumos', 'page_consumptions');
-create_chart('4', 'Curtidas & Reações', 'page_actions_post_reactions_total');
+create_chart('4', 'Reações', 'page_actions_post_reactions_like_total');
+//create_chart('4', 'Curtidas & Reações', 'page_actions_post_reactions_total');
 
 echo '</div>';
+
 
 //create_chart('4', 'Reações', 'page_actions_post_reactions_total');
 
