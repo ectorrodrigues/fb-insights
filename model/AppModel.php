@@ -12,7 +12,7 @@ function create_chart($chart_number, $title, $metric){
 	//$access_token = 'EAABxYZCBczmkBAF8iYYPLDIcWKTZBVLrhNl1xAjSjJObtg08HsZBZCekCyVunMLaBPSilj28uMwPAeQRGpWfd3eFSg7qMZCadqwPDMivtCZBL4MYIiYjoQOAvFDkNucJmfEXG5rRRdTecodrVqfUEsrkrdCZAZBp1vVor3jDse118gZDZD';
 
 	$object_id = $pageid;
-	$access_token = 'EAACEdEose0cBAGAiO8lku0onq2MCfZBiDiMXFBXctG0B4g5Nghoju6kz9lX57R716y5NgK88o2AOxeWJ9YkuTf8nO0NvFV0MMnEa2yZBEVZA99jWMRxRmeMA2tf3XXbAeZAc4Ec24ZA30OJhVFewU5t3JI8pRdBW1jt8CbNgfL0W6ATXNzSCXKGN3zQtbDoiKflpsoxKPYgZDZD';
+	$access_token = 'EAACEdEose0cBAIWZBLGPHmw4UJZCZBXRRs20n5ZCsxUTbcii54QnJWonsTZCuMlj7jWRTTUqhKyDCT0jthPvfqys4UpEdrdFM9Oq2IRf7ZBj6BdQDmDYZBSP1S40OdL2sGtlHZCZCfuPvo6CPb22KZBLsZCmJZBgmFVU8O6sYwHyNTLOu0IUb3CcHWLw1uHC5xPz12fV2CS4MpZBvigZDZD';
 	$metric = $metric;
 	$since = $since;
 	$until = $until;
@@ -152,7 +152,13 @@ function create_chart($chart_number, $title, $metric){
 	$average_past = number_format(($total_past/$numrows_past), 2);
 
 	$results = file_get_contents('result.php');
+
+	ob_start();
 	echo eval($results);
+
+	file_put_contents('output.php', ob_get_contents(), FILE_APPEND);
+
+	ob_flush();
 
 }
 

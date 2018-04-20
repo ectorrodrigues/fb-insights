@@ -48,8 +48,18 @@
 		create_chart('5', 'Compartilhamentos', 'page_positive_feedback_by_type');
 		create_chart('6', 'Comentários', 'page_positive_feedback_by_type');
 		create_chart('7', 'Likes na Page', 'page_fan_adds_by_paid_non_paid_unique');
+
+		//file_put_contents('output.php', '</div></body></html>', FILE_APPEND);
 	?>
 </div>
+
+<script language="javascript" type="text/javascript">
+  /* <![CDATA[ */
+    document.write('<a href="makepdf.php?url=' + encodeURIComponent(location.href) +'">');
+    document.write('Create PDF file of this page');
+    document.write('</a>');
+  /* ]]> */
+</script>
 
 </body>
 </html>

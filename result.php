@@ -1,5 +1,3 @@
-
-
 	echo '
 
 <style type="text/css">
@@ -137,5 +135,3 @@ echo '
 
 	</div>
 		';
-
-
